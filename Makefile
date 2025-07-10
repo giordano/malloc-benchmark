@@ -22,4 +22,4 @@ run-simple: $(SIMPLE_TARGET)
 clean:
 	rm -f $(TARGET) $(SIMPLE_TARGET)
 
-.PHONY: all run run-simple clean 
+.PHONY: all run run-simple clean
