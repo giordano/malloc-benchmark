@@ -1,13 +1,13 @@
-# Malloc Benchmark for 100-element Double Array
+# Malloc Benchmark for Configurable Double Array
 
-This C program benchmarks the performance of `malloc()` for allocating a 100-element array of `double` values.
+This C program benchmarks the performance of `malloc()` for allocating an array of `double` values. The array size is configurable via a command-line argument.
 
 ## Features
 
 - **Precise timing**: Uses `gettimeofday()` for microsecond precision
 - **Multiple test runs**: Runs 10 separate test runs for statistical reliability
 - **Comprehensive statistics**: Reports min, max, and average times
-- **Memory size**: Allocates exactly 800 bytes (100 doubles × 8 bytes each)
+- **Configurable memory size**: Array size can be set via command line (default: 100 doubles)
 - **System warm-up**: Performs initial allocations to stabilize performance
 - **Error handling**: Tracks failed allocations
 
@@ -24,14 +24,25 @@ gcc -Wall -Wextra -O2 -std=c99 -o malloc_benchmark malloc_benchmark.c
 
 ## Usage
 
-Run the benchmark:
-```bash
-make run
-```
-
-Or directly:
+Run the benchmark with the default array size (100 doubles):
 ```bash
 ./malloc_benchmark
+```
+
+Specify a custom array size (e.g., 500 doubles):
+```bash
+./malloc_benchmark 500
+```
+
+Show help:
+```bash
+./malloc_benchmark -h
+```
+
+Or use the Makefile targets:
+```bash
+make run           # Default (100 doubles)
+./malloc_benchmark 1000  # Custom (1000 doubles)
 ```
 
 ## Output
@@ -48,35 +59,33 @@ The program will output:
 
 You can modify the following constants in `malloc_benchmark.c`:
 
-- `ARRAY_SIZE`: Number of doubles to allocate (default: 100)
-- `NUM_ITERATIONS`: Number of malloc operations per test run (default: 10,000)
+- `NUM_ITERATIONS`: Number of malloc operations per test run (default: 100,000)
 - `NUM_TESTS`: Number of separate test runs (default: 10)
 
 ## Example Output
 
 ```
-=== Malloc Benchmark for 100-element Double Array ===
+=== Malloc Benchmark for 500-element Double Array ===
 System: Linux
-Array size: 100 doubles (800 bytes)
-Iterations per test: 10000
+Array size: 500 doubles (4000 bytes)
+Iterations per test: 100000
 Number of test runs: 10
 
 Warming up the system...
 Warm-up complete.
 
-Running 10 test runs with 10000 iterations each...
+Running 10 test runs with 100000 iterations each...
 
-Test run 1/10: Average: 0.15 microseconds
-Test run 2/10: Average: 0.14 microseconds
+Test run 1/10: Average: 0.02 microseconds
 ...
-Test run 10/10: Average: 0.16 microseconds
+Test run 10/10: Average: 0.02 microseconds
 
 === OVERALL STATISTICS ===
 Valid test runs: 10/10
-Overall average time: 0.15 microseconds
-Best test run average: 0.14 microseconds
-Worst test run average: 0.17 microseconds
-Memory size per allocation: 800 bytes (100 doubles)
+Overall average time: 0.02 microseconds
+Best test run average: 0.01 microseconds
+Worst test run average: 0.03 microseconds
+Memory size per allocation: 4000 bytes (500 doubles)
 
 Benchmark completed!
 ```

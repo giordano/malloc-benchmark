@@ -1,13 +1,17 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <time.h>
 #include <sys/time.h>
 #include <unistd.h>
 #include <limits.h>
 
-#define ARRAY_SIZE 100
+#define DEFAULT_ARRAY_SIZE 100
 #define NUM_ITERATIONS 100000
 #define NUM_TESTS 10
+
+// Global variable for array size
+int array_size = DEFAULT_ARRAY_SIZE;
 
 // Function to get current time in microseconds
 long long get_time_microseconds() {
@@ -20,7 +24,7 @@ long long get_time_microseconds() {
 long long benchmark_single_malloc() {
     long long start_time = get_time_microseconds();
 
-    double *array = (double *)malloc(ARRAY_SIZE * sizeof(double));
+    double *array = (double *)malloc(array_size * sizeof(double));
 
     long long end_time = get_time_microseconds();
 
@@ -30,7 +34,7 @@ long long benchmark_single_malloc() {
     }
 
     // Initialize array to avoid compiler optimization
-    for (int i = 0; i < ARRAY_SIZE; i++) {
+    for (int i = 0; i < array_size; i++) {
         array[i] = (double)i;
     }
 
@@ -42,7 +46,7 @@ long long benchmark_single_malloc() {
 // Function to benchmark multiple malloc operations
 void benchmark_multiple_mallocs() {
     printf("Benchmarking %d malloc operations for %d-element double array...\n",
-           NUM_ITERATIONS, ARRAY_SIZE);
+           NUM_ITERATIONS, array_size);
 
     long long total_time = 0;
     long long min_time = LLONG_MAX;
@@ -80,7 +84,7 @@ void benchmark_multiple_mallocs() {
         printf("  Average time per malloc: %.2f microseconds\n", avg_time);
         printf("  Minimum time: %lld microseconds\n", min_time);
         printf("  Maximum time: %lld microseconds\n", max_time);
-        printf("  Memory allocated per malloc: %zu bytes\n", ARRAY_SIZE * sizeof(double));
+        printf("  Memory allocated per malloc: %zu bytes\n", array_size * sizeof(double));
     } else {
         printf("All malloc operations failed!\n");
     }
@@ -140,21 +144,51 @@ void run_multiple_tests() {
         printf("Best test run average: %.2f microseconds\n", min_avg);
         printf("Worst test run average: %.2f microseconds\n", max_avg);
         printf("Memory size per allocation: %zu bytes (%d doubles)\n",
-               ARRAY_SIZE * sizeof(double), ARRAY_SIZE);
+               array_size * sizeof(double), array_size);
     }
 }
 
-int main() {
-    printf("=== Malloc Benchmark for 100-element Double Array ===\n");
+void print_usage(const char *program_name) {
+    printf("Usage: %s [array_size]\n", program_name);
+    printf("  array_size: Number of doubles to allocate (default: %d)\n", DEFAULT_ARRAY_SIZE);
+    printf("  Example: %s 1000    # Benchmark 1000-element array\n", program_name);
+    printf("  Example: %s         # Benchmark %d-element array (default)\n", program_name, DEFAULT_ARRAY_SIZE);
+}
+
+int main(int argc, char *argv[]) {
+    // Parse command line arguments
+    if (argc > 2) {
+        fprintf(stderr, "Error: Too many arguments\n");
+        print_usage(argv[0]);
+        return 1;
+    }
+
+    if (argc == 2) {
+        if (strcmp(argv[1], "-h") == 0 || strcmp(argv[1], "--help") == 0) {
+            print_usage(argv[0]);
+            return 0;
+        }
+
+        char *endptr;
+        array_size = strtol(argv[1], &endptr, 10);
+        
+        if (*endptr != '\0' || array_size <= 0) {
+            fprintf(stderr, "Error: Invalid array size '%s'. Must be a positive integer.\n", argv[1]);
+            print_usage(argv[0]);
+            return 1;
+        }
+    }
+
+    printf("=== Malloc Benchmark for %d-element Double Array ===\n", array_size);
     printf("System: Linux\n");
-    printf("Array size: %d doubles (%zu bytes)\n", ARRAY_SIZE, ARRAY_SIZE * sizeof(double));
+    printf("Array size: %d doubles (%zu bytes)\n", array_size, array_size * sizeof(double));
     printf("Iterations per test: %d\n", NUM_ITERATIONS);
     printf("Number of test runs: %d\n\n", NUM_TESTS);
 
     // Warm up the system
     printf("Warming up the system...\n");
     for (int i = 0; i < 1000; i++) {
-        double *temp = malloc(ARRAY_SIZE * sizeof(double));
+        double *temp = malloc(array_size * sizeof(double));
         if (temp) {
             free(temp);
         }
