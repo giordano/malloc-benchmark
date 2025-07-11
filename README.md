@@ -19,7 +19,7 @@ make
 
 Or manually:
 ```bash
-gcc -Wall -Wextra -O2 -std=c99 -o malloc_benchmark malloc_benchmark.c
+cc -Wall -Wextra -O2 -std=c99 -o malloc_benchmark malloc_benchmark.c
 ```
 
 ## Usage

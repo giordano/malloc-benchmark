@@ -1,4 +1,4 @@
-CC = gcc
+CC = cc
 CFLAGS = -Wall -Wextra -O2 -std=c99
 TARGET = malloc_benchmark
 SIMPLE_TARGET = simple_malloc_benchmark
